@@ -1,57 +1,46 @@
-# AI4EO_Land_Cover_Classification
+# AI4EO Multi-Task Project
 
-# AI4EO Data Preprocessing Script
+## Project Overview
+This project aims to demonstrate the application of AI in Earth Observation (AI4EO) using Sentinel-2 multi-spectral imagery. The project covers three main tasks:
 
-import rasterio
-import numpy as np
-import os
+1. Land Cover Classification (Image Classification)
+2. Vegetation Index Prediction (Regression)
+3. Image Alignment and Change Detection
 
-# Function to load Sentinel-2 image
-def load_satellite_image(file_path):
-    with rasterio.open(file_path) as src:
-        image = src.read()  # Read multi-band image
-        profile = src.profile
-    return image, profile
+## Project Structure
+```
+AI4EO_MultiTask_Project/
+├── data/               # Raw and preprocessed data
+├── src/                # Source code
+│   ├── part1_classification.py   # Image Classification
+│   ├── part2_regression.py       # Regression Analysis
+│   ├── part3_image_alignment.py  # Image Alignment and Change Detection
+│   └── part4_explainability.py   # Explainable AI
+├── notebooks/          # Jupyter Notebook (Exploratory Analysis)
+├── results/            # Model Results and Evaluation
+└── README.md           # Project Documentation
+```
 
-# Function to normalize image data
-def normalize_image(image):
-    return image / 10000.0  # Normalize pixel values
+## Data Preprocessing
+The data preprocessing process is handled in the `data_preprocessing.py` script. It includes:
 
-# Function to apply cloud mask based on band threshold
-def apply_cloud_mask(image, band_index, threshold=0.2):
-    cloud_mask = image[band_index] > threshold
-    image[:, cloud_mask] = 0  # Mask cloudy pixels
-    return image
+1. Loading Sentinel-2 multi-spectral imagery.
+2. Normalizing image pixel values.
+3. Applying cloud masking based on band threshold.
+4. Calculating multiple vegetation indices (NDVI, EVI, NDWI).
+5. Automatically saving processed images for further analysis.
 
-# Function to calculate NDVI
-def calculate_ndvi(image, nir_band=7, red_band=3):
-    nir = image[nir_band].astype(float)
-    red = image[red_band].astype(float)
-    ndvi = (nir - red) / (nir + red + 1e-10)
-    return ndvi
+### Additional Improvements:
+- Added support for calculating EVI (Enhanced Vegetation Index) and NDWI (Normalized Difference Water Index).
+- Added automatic saving of NDVI, EVI, and NDWI images.
 
-# Function to save processed image
-def save_processed_image(image, profile, output_path):
-    with rasterio.open(output_path, 'w', **profile) as dst:
-        dst.write(image)
+### How to Use:
+- Ensure the Sentinel-2 image is placed in the `data/` folder.
+- Adjust the image path in the `data_preprocessing.py` script as needed.
+- Run the script using:
 
-# Main script
-if __name__ == "__main__":
-    image_path = "data/sample_image.tif"
-    output_path = "data/processed_image.tif"
+```bash
+python src/data_preprocessing.py
+```
+- The processed images (NDVI, EVI, NDWI) will be saved in the same directory with corresponding names.
 
-    # Load and preprocess image
-    image, profile = load_satellite_image(image_path)
-    image = normalize_image(image)
-
-    # Apply cloud mask (using band 2 for cloud detection)
-    image = apply_cloud_mask(image, band_index=2, threshold=0.2)
-
-    # Calculate NDVI
-    ndvi = calculate_ndvi(image)
-
-    # Save processed image
-    profile.update(dtype=rasterio.float32, count=1)
-    save_processed_image(ndvi, profile, output_path)
-
-    print("Preprocessing complete. Processed image saved at:", output_path)
