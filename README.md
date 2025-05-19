@@ -1,5 +1,15 @@
 # AI4EO Multi-Task Project
 
+## Problem Description
+
+Earth observation (EO) using satellite imagery has become a crucial tool for monitoring and understanding various environmental processes. However, the vast amount of data produced by satellite missions such as Sentinel-2 presents significant challenges in terms of data processing, analysis, and interpretation. This project aims to leverage Artificial Intelligence (AI) techniques to automate three key tasks in EO:
+
+1. Land Cover Classification: Identifying different land cover types (water, forest, agricultural land, urban areas) using multi-spectral satellite imagery. This task helps in monitoring land use changes, detecting deforestation, and understanding urban expansion.
+
+2. Vegetation Index Prediction: Accurately predicting vegetation indices (NDVI, EVI) using regression models. These indices are essential for assessing vegetation health, monitoring crop conditions, and detecting environmental stress.
+
+3. Image Alignment and Change Detection: Aligning multi-temporal images and detecting changes over time using feature matching and change detection techniques. This is useful for monitoring natural disasters, assessing water body changes, and detecting land degradation.
+
 ## Project Overview
 This project aims to demonstrate the application of AI in Earth Observation (AI4EO) using Sentinel-2 multi-spectral imagery. The project covers three main tasks:
 
@@ -43,4 +53,3 @@ The data preprocessing process is handled in the `data_preprocessing.py` script.
 python src/data_preprocessing.py
 ```
 - The processed images (NDVI, EVI, NDWI) will be saved in the same directory with corresponding names.
-
