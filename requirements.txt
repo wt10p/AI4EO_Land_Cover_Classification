@@ -1,0 +1,9 @@
+rasterio
+numpy
+torch
+torchvision
+scikit-learn
+matplotlib
+
+pip install -r requirements.txt
+
