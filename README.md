@@ -27,13 +27,28 @@ AI4EO_Flood_Project/
 
 ## Data Preprocessing
 The `data_preprocessing.py` script in `src/` performs:
-- **Loading:** Read Sentinel‑2 bands (B02, B03, B04, B08) from `.tif`.
-- **Normalization:** Scale reflectance values.
-- **Cloud Masking:** Threshold‑based cloud removal.
-- **Index Calculation:** Compute NDVI, NDWI, and other indices.
-- **Output:** Save processed single‑band GeoTIFFs to `data/processed/`.
+- **Loading:** Read Sentinel‑2 bands (B02, B03, B04, B08) from GeoTIFFs or JP2 files
+  - If you downloaded a `.SAFE` directory, the individual band files are in:
+    ```
+    <YOUR_SCENE>.SAFE/GRANULE/*/IMG_DATA/R10m/B02.jp2
+    <YOUR_SCENE>.SAFE/GRANULE/*/IMG_DATA/R10m/B03.jp2
+    <YOUR_SCENE>.SAFE/GRANULE/*/IMG_DATA/R10m/B04.jp2
+    <YOUR_SCENE>.SAFE/GRANULE/*/IMG_DATA/R10m/B08.jp2
+    ```
+  - You can point `--input-dir` to the folder containing these `.jp2` files, or convert them to `.tif` using GDAL:
+    ```bash
+    gdal_translate -of GTiff B04.jp2 B04.tif
+    ```
+- **Normalization:** Scale reflectance values (e.g. divide by 10000 for L2A products)
+- **Cloud Masking:** Threshold‑based cloud removal
+- **Index Calculation:** Compute NDVI, NDWI, and other indices
+- **Output:** Save processed single‑band GeoTIFFs to `data/processed/`
 
 ### Usage
+```bash
+# Preprocess raw Sentinel‑2 bands (JP2 or GeoTIFF)
+python src/data_preprocessing.py --input-dir data/ --output-dir data/processed/
+```
 ```bash
 # Preprocess raw Sentinel‑2 bands
 python src/data_preprocessing.py --input-dir data/ --output-dir data/processed/
