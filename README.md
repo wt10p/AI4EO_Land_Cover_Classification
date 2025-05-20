@@ -61,4 +61,23 @@ python src/data_preprocessing.py --input-dir data/ --output-dir data/processed/
    python src/part5_explainability.py --model-dir results/ --data-dir data/processed/
    ```
 
-Refer to individual scripts’ docstrings for detailed options and parameters.
+## Recommended Study Area
+
+**Chao Phraya River Basin, Thailand**
+
+- Experienced major floods in 2011 and 2017, with extensive documentation.
+- Diverse landscapes: urban (Bangkok), agricultural plains, riverine wetlands.
+- Sentinel‑2 L2A data are readily available.
+
+**Suggested Workflow for This Region:**
+1. **Select Pre‑Flood & Post‑Flood Dates:**
+   - Example events (post‑2016):
+     - 2017 Thailand floods (pre: 2017-07-01; post: 2017-07-30)
+     - 2020 Thailand floods (pre: 2020-07-15; post: 2020-08-15)
+
+4. **Preprocess & Generate Indices:**
+   - Run `data_preprocessing.py` to produce NDVI, NDWI, etc.
+5. **Run AI4EO Pipeline:**
+   - Execute parts 1–5 as per **Next Steps**.
+
+Place your selected GeoTIFFs in **`data/`** and name them `pre_flood.tif` and `post_flood.tif` for consistency.
