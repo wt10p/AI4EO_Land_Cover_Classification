@@ -1,98 +1,91 @@
-# Flood Remote Sensing with AI4EO
+# Arctic Sea‐Ice Altimetry Interpolation with GPSat
 
-## Problem Description
-Flood events cause widespread damage and pose significant risks to communities. Traditional flood mapping depends on manual interpretation and scattered in-situ measurements, which can be slow and lack spatial coverage. Sentinel‑2 L2A multi‑spectral imagery (10 m resolution, 5‑day revisit) provides timely, high-resolution observations of inundation extents. This project automates five key tasks using AI techniques:
+## Background
 
-1. **Flood Extent Classification:** Semantic segmentation of inundated vs. non‑inundated areas.
-2. **Water Depth Estimation:** Regression models to predict water depth from spectral indices and available ground observations.
-3. **Image Alignment & Change Detection:** Feature‑based and optical‑flow methods to align multi‑temporal images and detect changes.
-4. **Spatial Interpolation:** Gaussian Process Regression to interpolate sparse water depth observations into continuous water depth maps.
-5. **Explainable AI:** SHAP and Grad‑CAM to interpret model decisions and identify key spectral drivers.
+To capture sea‐ice and ocean surface features, satellite radar altimetry employs a SAR‐mode radar that emits microwave pulses and measures return time and waveform properties (e.g., pulse peakiness) as the satellite moves along its orbit. Delay‐Doppler processing enhances along‐track resolution by combining multiple Doppler‐shifted echoes, enabling retrieval of sea surface height anomaly (SLA) and ice freeboard over leads and floes. However, these along‐track measurements remain spatially sparse and non‐uniform, motivating the use of data‐driven interpolation methods.
 
-## Project Structure
-```
-AI4EO_Flood_Project/
-├── data/                   # Raw Sentinel‑2 bands and preprocessed indices
-├── src/                    # Source code scripts
-│   ├── data_preprocessing.py   # Load bands, normalize, cloud mask, calculate NDVI, NDWI, etc.
-│   ├── part1_classification.py # Flood extent segmentation
-│   ├── part2_regression.py     # Water depth estimation
-│   ├── part3_alignment.py      # Image alignment & change detection
-│   └── part4_interpolation.py  # Gaussian Process interpolation
-│   └── part5_explainability.py # Model interpretability
-├── notebooks/              # Exploratory analysis and visualization notebooks
-├── results/                # Output maps, models, evaluation plots
-└── README.md               # Project documentation (this file)
-```
+On the algorithmic side, we compare two interpolation paradigms: classical cubic‐spline interpolation, which fits smooth polynomials along the track coordinate, and Gaussian‐process regression (GPR), a Bayesian nonparametric approach that models SLA and freeboard as random functions with covariance kernels. The GPR implementation (via the GPSat toolkit) leverages localized “expert” subsets along the track to reduce computational cost while providing both predictions and uncertainty estimates. By combining these techniques, we can reconstruct continuous profiles of SLA and freeboard, filling measurement gaps and characterizing interpolation uncertainty.
 
-## Data Preprocessing
-The `data_preprocessing.py` script in `src/` performs:
-- **Loading:** Read Sentinel‑2 bands (B02, B03, B04, B08) from GeoTIFFs or JP2 files
-  - If you downloaded a `.SAFE` directory, the individual band files are in:
-    ```
-    <YOUR_SCENE>.SAFE/GRANULE/*/IMG_DATA/R10m/B02.jp2
-    <YOUR_SCENE>.SAFE/GRANULE/*/IMG_DATA/R10m/B03.jp2
-    <YOUR_SCENE>.SAFE/GRANULE/*/IMG_DATA/R10m/B04.jp2
-    <YOUR_SCENE>.SAFE/GRANULE/*/IMG_DATA/R10m/B08.jp2
-    ```
-  - You can point `--input-dir` to the folder containing these `.jp2` files, or convert them to `.tif` using GDAL:
-    ```bash
-    gdal_translate -of GTiff B04.jp2 B04.tif
-    ```
-- **Normalization:** Scale reflectance values (e.g. divide by 10000 for L2A products)
-- **Cloud Masking:** Threshold‑based cloud removal
-- **Index Calculation:** Compute NDVI, NDWI, and other indices
-- **Output:** Save processed single‑band GeoTIFFs to `data/processed/`
+Sea‐ice radar altimetry provides along‐track measurements of sea surface height anomaly (SLA) and ice freeboard at discrete points along satellite orbits. These observations are irregularly spaced and subject to gaps where the satellite does not traverse or where data are flagged as low quality (e.g., leads vs. floes). Reliable interpolation is therefore essential to reconstruct continuous SLA and freeboard profiles, quantify uncertainties, and enable detailed mapping of sea‐ice thickness and local ocean dynamics over polar regions.
 
-### Usage
-```bash
-# Preprocess raw Sentinel‑2 bands (JP2 or GeoTIFF)
-python src/data_preprocessing.py --input-dir data/ --output-dir data/processed/
-```
-```bash
-# Preprocess raw Sentinel‑2 bands
-python src/data_preprocessing.py --input-dir data/ --output-dir data/processed/
+Sea‐ice radar altimetry provides along‐track measurements of sea surface height anomaly (SLA) and ice freeboard at discrete points along satellite orbits. These observations are irregularly spaced and subject to gaps where the satellite does not traverse or where data are flagged as low quality (e.g., leads vs. floes). Reliable interpolation is therefore essential to reconstruct continuous SLA and freeboard profiles, quantify uncertainties, and enable detailed mapping of sea‐ice thickness and local ocean dynamics over polar regions.
+
+Over a \~48‐hour observational window in the Arctic region (2019‑01‑10 00:22 UTC to 2019‑01‑11 19:17 UTC), we employ two distinct interpolation strategies:
+
+## Interpolation Methods
+
+### 1. Sparse Gaussian‐Process Regression (GPSat Toolkit)
+
+**Notebook:** `Chapter_2_SLA_GPSat_GPOD.ipynb`
+
+* **Input:** GPOD‐processed Sentinel‑3 SAR Level‑1A `.proc` files parsed into a consolidated CSV (`df_GPOD.csv`) containing longitude, latitude, SLA, error estimates, freeboard, and pulse peakiness.
+* **Approach:** We build a Sparse Gaussian‐Process Regression (SGPR) model using the GPSat package. The workflow defines a set of local “expert” subsets along the satellite tracks, fits a Gaussian process to each subset, and then stitches the predictions onto a regular grid.
+* **Outputs:** Gridded SLA fields, uncertainty maps, and scatterplots comparing observed vs. predicted SLA.
+
+### 2. Classical Cubic‐Spline Interpolation & Along‐Track Comparison
+
+**Notebook:** `Chapter_2_GPSat_along_track.ipynb`
+
+* **Input:** The same GPOD `.proc` files and their parsed DataFrame of along‐track measurements.
+* **Approaches:**
+
+  1. **Cubic‐Spline Interpolation:** A one‐dimensional cubic spline is fit to each satellite track independently, interpolating SLA (and freeboard) along the track coordinate.
+  2. **Gaussian‐Process Interpolation:** Using GPSat, a one‐dimensional Gaussian‐process regressor is trained on the same track data to produce continuous predictions with uncertainty estimates.
+* **Comparison:** Side‐by‐side profile plots and error metrics (RMSE, bias) quantify performance differences between spline and GP methods along each track.
+
+## Repository Structure
+
+```text
+.
+├── data/
+│   ├── *.proc                        # GPOD-provided Sentinel-3 .proc files
+│   └── df_GPOD.csv                   # Parsed CSV for SLA notebook
+├── notebooks/
+│   ├── Chapter_2_SLA_GPSat_GPOD.ipynb
+│   └── Chapter_2_GPSat_along_track.ipynb
+├── requirements.txt                  # Python dependencies
+├── environment.yml                   # Conda environment file
+└── README.md                         # This document
 ```
 
-## Next Steps
-1. **Run Flood Extent Classification:**
+## Installation
+
+1. **Clone repository**:
+
    ```bash
-   python src/part1_classification.py --data-dir data/processed/ --output-dir results/
-   ```
-2. **Estimate Water Depth (Regression):**
-   ```bash
-   python src/part2_regression.py --data-dir data/processed/ --output-dir results/
-   ```
-3. **Align Images & Detect Changes:**
-   ```bash
-   python src/part3_alignment.py --data-dir data/processed/ --output-dir results/
-   ```
-4. **Interpolate Water Depth:**
-   ```bash
-   python src/part4_interpolation.py --data-dir results/observations.csv --output-dir results/
-   ```
-5. **Explain Models:**
-   ```bash
-   python src/part5_explainability.py --model-dir results/ --data-dir data/processed/
+   git clone https://github.com/yourusername/Arctic-Altimetry-Interpolation.git
+   cd Arctic-Altimetry-Interpolation
    ```
 
-## Recommended Study Area
+2. **Set up environment**:
 
-**Chao Phraya River Basin, Thailand**
+   ```bash
+   conda env create -f environment.yml   # or create venv + pip install
+   pip install -r requirements.txt
+   pip install -e .
+   ```
 
-- Experienced major floods in 2011 and 2017, with extensive documentation.
-- Diverse landscapes: urban (Bangkok), agricultural plains, riverine wetlands.
-- Sentinel‑2 L2A data are readily available.
+## Data Acquisition
 
-**Suggested Workflow for This Region:**
-1. **Select Pre‑Flood & Post‑Flood Dates:**
-   - Example events (post‑2016):
-     - 2017 Thailand floods (pre: 2017-07-01; post: 2017-07-30)
-     - 2020 Thailand floods (pre: 2020-07-15; post: 2020-08-15)
+* **GPOD .proc files**: Place the provided Sentinel‑3 SAR `.proc` files into `data/`. These cover 2019‑01‑10 00:22 UTC to 2019‑01‑11 19:17 UTC.
+* **Parsing:** Run the first cells of either notebook to convert `.proc` files into `data/df_GPOD.csv`.
 
-4. **Preprocess & Generate Indices:**
-   - Run `data_preprocessing.py` to produce NDVI, NDWI, etc.
-5. **Run AI4EO Pipeline:**
-   - Execute parts 1–5 as per **Next Steps**.
+## How to Run
 
-Place your selected GeoTIFFs in **`data/`** and name them `pre_flood.tif` and `post_flood.tif` for consistency.
+1. **Notebook 1** (`Chapter_2_SLA_GPSat_GPOD.ipynb`):
+
+   * Load `df_GPOD.csv`, configure GPSat parameters, fit SGPR models, and generate gridded SLA and uncertainty outputs.
+
+2. **Notebook 2** (`Chapter_2_GPSat_along_track.ipynb`):
+
+   * Load `df_GPOD.csv`, parse individual tracks, apply cubic‐spline and GP interpolations, and compare along‐track profiles with error metrics.
+
+Each notebook contains detailed comments, inline plots, and example parameter settings to reproduce the full analysis in Colab or Jupyter.
+
+## License
+
+This project is licensed under the **MIT License**.
+
+## Contact
+
+For questions or feedback, please open an issue or contact **Your Name** at [your.email@example.com](mailto:your.email@example.com).
