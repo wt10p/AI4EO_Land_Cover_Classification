@@ -21,6 +21,28 @@ Over a \~48‐hour observational window in the Arctic region (2019‑01‑10 00:
 * **Input:** GPOD‐processed Sentinel‑3 SAR Level‑1A `.proc` files parsed into a consolidated CSV (`df_GPOD.csv`) containing longitude, latitude, SLA, error estimates, freeboard, and pulse peakiness.
 * **Approach:** We build a Sparse Gaussian‐Process Regression (SGPR) model using the GPSat package. The workflow defines a set of local “expert” subsets along the satellite tracks, fits a Gaussian process to each subset, and then stitches the predictions onto a regular grid.
 * **Outputs:** Gridded SLA fields, uncertainty maps, and scatterplots comparing observed vs. predicted SLA.
+* 
+* ## The Sentinel-3 SAR Altimeter (SRAL)
+
+The Sentinel-3 mission, operated jointly by ESA and EUMETSAT, carries a state-of-the-art Synthetic Aperture Radar Altimeter (SRAL) designed to deliver precise sea surface height and ice-surface elevation measurements. Unlike conventional pulse-limited altimeters, SAR altimetry exploits along-track Doppler processing to synthetically narrow the instrument’s footprint, achieving finer spatial resolution (≈300 m) and higher signal-to-noise ratios, especially over complex surfaces such as sea-ice and coastal zones.
+
+### Synthetic Aperture Radar Mode
+
+In SAR mode, the SRAL transmits a burst of radar pulses at L-band frequency toward the Earth’s surface. Echoes are recorded at full bit-rate (FBR), capturing fine waveform structure. Onboard and on-ground Delay-Doppler processing coherently combines these pulses, synthesizing a narrower along-track antenna beam. The result is a set of high-resolution waveforms whose leading edge can be retracked to estimate the range to the surface with centimetric accuracy.
+
+### Retracking and Geophysical Products
+
+Once Level-1A FBR waveforms are generated, retracking algorithms (e.g., SAMOSA+ or ALES+) fit a model to the leading edge to locate the point of closest approach. The retracked ranges, combined with precise orbit data and corrections for dry and wet troposphere, ionosphere, sea state bias, and tides, yield Level-2 geophysical parameters:
+- **Sea Level Anomaly (SLA)**: deviation of the instantaneous sea surface from a long-term mean  
+- **Radar Freeboard**: height of ice floes above the surrounding water level  
+- **Pulse Peakiness & Quality Flags**: indicators of surface complexity and retracker confidence  
+
+These L2 products are packaged in CF-compliant NetCDF files, providing along-track time, latitude, longitude, elevation, and ancillary metadata.
+
+### Applications in Sea-Ice Studies
+
+Thanks to its fine along-track resolution and robust retracking over heterogeneous surfaces, SRAL L2 data are ideal for studying Arctic and Antarctic sea-ice. In this project, we leverage SRAL’s Level-2 Sea-Ice Altimetry (`SR_2_LAN_SI`) product—covering both ice floes and open leads—to perform along-track interpolation, compare classical spline and Gaussian-process methods, and quantify uncertainties in sea-ice freeboard and sea-level anomaly estimates.
+
 
 ### 2. Classical Cubic‐Spline Interpolation & Along‐Track Comparison
 
