@@ -127,8 +127,35 @@ This project emphasizes sustainable AI by relying entirely on CPU-based processi
 | Parsing & Preprocessing (Colab CPU)        | 12 min      | 0.000042           |
 | Interpolation & Analysis (Colab CPU)       | 18 min      | 0.000063           |
 
+## ♻️ Carbon Emissions Estimation (via Code)
 
-## Installation
+Below is a self-contained Python snippet to show how to estimate the extremely low CO₂ footprint of our Colab CPU workflows:
+
+```python
+# Assumed parameters (adjust per your hardware/region)
+CPU_POWER_W = 20             # average CPU + RAM power draw in watts
+CARBON_INTENSITY = 0.357     # kg CO₂ emitted per kWh (EU average)
+
+# Two key processing stages and their durations in seconds
+durations_s = {
+    "Parsing & Preprocessing": 12 * 60,    # 12 minutes
+    "Interpolation & Analysis": 18 * 60,   # 18 minutes
+}
+
+total_co2 = 0.0
+for stage, dur in durations_s.items():
+    # Convert watts × time to kWh: (W × s) / (1000 × 3600)
+    energy_kwh = CPU_POWER_W * dur / (1000 * 3600)
+    # CO₂ in kg = energy (kWh) × carbon intensity (kg CO₂/kWh)
+    co2_kg = energy_kwh * CARBON_INTENSITY
+    total_co2 += co2_kg
+    print(f"{stage:30s}: {energy_kwh:.6f} kWh → {co2_kg:.6f} kg CO₂")
+
+print(f"{'TOTAL':30s}: — → {total_co2:.6f} kg CO₂")
+```
+
+
+### Installation
 
 1. **Clone repository**:
 
