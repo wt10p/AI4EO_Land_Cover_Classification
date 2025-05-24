@@ -1,5 +1,6 @@
 # Arctic Sea‐Ice Altimetry Interpolation with GPSat
 
+![Arctic SSI on 2019261](figures/arctic_ssi_2019261_lrg.png)
 
 ## Background
 
