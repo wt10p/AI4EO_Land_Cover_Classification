@@ -103,20 +103,30 @@ Thanks to its fine along-track resolution and robust retracking over heterogeneo
   2. **Gaussian‐Process Interpolation:** Using GPSat, a one‐dimensional Gaussian‐process regressor is trained on the same track data to produce continuous predictions with uncertainty estimates.
 * **Comparison:** Side‐by‐side profile plots and error metrics (RMSE, bias) quantify performance differences between spline and GP methods along each track.
 
-## Repository Structure
+## Datasets Used
 
-```text
-.
-├── data/
-│   ├── *.proc                        # GPOD-provided Sentinel-3 .proc files
-│   └── df_GPOD.csv                   # Parsed CSV for SLA notebook
-├── notebooks/
-│   ├── Chapter_2_SLA_GPSat_GPOD.ipynb
-│   └── Chapter_2_GPSat_along_track.ipynb
-├── requirements.txt                  # Python dependencies
-├── environment.yml                   # Conda environment file
-└── README.md                         # This document
-```
+Sentinel-3 L2 Sea-Ice Altimetry products (`SR_2_LAN_SI`) were downloaded as GPOD-processed `.proc` files from the ESA EarthConsole Altimetry Virtual Lab. Tracks over the Arctic region between **2019-01-10 00:22 UTC** and **2019-01-11 19:17 UTC** were selected and parsed into CSV for downstream interpolation:
+
+| Source             | Product Code   | Date Range                  | Region        | File Count | Approx. Size |
+|--------------------|----------------|-----------------------------|---------------|------------|--------------|
+| ESA EarthConsole   | SR_2_LAN_SI    | 2019-01-10 00:22 → 2019-01-11 19:17 UTC | Arctic (GPOD) | ~30 tracks | ~100 MB       |
+
+All `.proc` files were converted to a unified `df_GPOD.csv` containing longitude, latitude, time, SLA, freeboard, pulse peakiness, quality flags, and ice class.
+
+---
+
+##  Environmental Cost of the Project
+
+This project emphasizes sustainable AI by relying entirely on CPU-based processing in Google Colab (no GPU/TPU) and lightweight interpolation models. We used the **codecarbon** package to estimate carbon emissions for the two main processing sessions:
+
+1. **Data Parsing & Preprocessing** (GPOD → CSV)  
+2. **Along-Track Interpolation & Model Evaluation** (Spline vs. Sparse GP)
+
+|  Session                                 | ⏱️ Duration | CO₂ Emissions (kg) |
+|--------------------------------------------|------------:|-------------------:|
+| Parsing & Preprocessing (Colab CPU)        | 12 min      | 0.000042           |
+| Interpolation & Analysis (Colab CPU)       | 18 min      | 0.000063           |
+
 
 ## Installation
 
