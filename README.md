@@ -189,6 +189,10 @@ print(f"{'TOTAL':30s}: — → {total_co2:.6f} kg CO₂")
 
 Each notebook contains detailed comments, inline plots, and example parameter settings to reproduce the full analysis in Colab or Jupyter.
 
+## Acknowledgments
+
+This project was created for GEOL0069 at University College London, taught by Dr. Michel Tsamados and Weibin Chen.
+
 ## License
 
 This project is licensed under the **MIT License**.
