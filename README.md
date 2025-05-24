@@ -38,6 +38,9 @@ Sentinel-3’s SAR Radar Altimeter (SRAL) delivers a tiered set of processing le
 | Land/Ice Altimetry (Sea Ice)        | SR_2_LAN_SI     | Along-track height & freeboard over ice floes & leads | Sea-ice freeboard and thickness estimation       |
 | Pulse Peakiness & Quality Flags     | –               | Statistical metrics on waveform shape         | Filters low-confidence returns, surface classification |
 
+![SRAL Workflow](figures/s3_sral_workflow.png)
+
+
 
 ### Synthetic Aperture Radar Mode
 
