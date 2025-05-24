@@ -26,6 +26,19 @@ Over a \~48‐hour observational window in the Arctic region (2019‑01‑10 00:
 
 The Sentinel-3 mission, operated jointly by ESA and EUMETSAT, carries a state-of-the-art Synthetic Aperture Radar Altimeter (SRAL) designed to deliver precise sea surface height and ice-surface elevation measurements. Unlike conventional pulse-limited altimeters, SAR altimetry exploits along-track Doppler processing to synthetically narrow the instrument’s footprint, achieving finer spatial resolution (≈300 m) and higher signal-to-noise ratios, especially over complex surfaces such as sea-ice and coastal zones.
 
+## The Sentinel-3 SAR Altimetry Product Suite
+
+Sentinel-3’s SAR Radar Altimeter (SRAL) delivers a tiered set of processing levels tailored for both open-ocean and sea-ice applications:
+
+| Product                             | Product Code    | Description                                    | Main Use                                         |
+|-------------------------------------|-----------------|------------------------------------------------|--------------------------------------------------|
+| Full Bit-Rate Waveforms             | L1A (FBR)       | Raw SAR echoes sampled at full bit-rate        | Input to advanced retrackers (e.g. SAMOSA+, ALES+) |
+| Delay-Doppler Waveforms             | L1B (DD-FBR)    | On-ground Delay-Doppler processing of FBR data | Achieves ~300 m along-track resolution            |
+| Ocean Altimetry                     | SR_2_OCN        | Sea Surface Height Anomaly over open water     | Global SLA mapping and ocean circulation studies |
+| Land/Ice Altimetry (Sea Ice)        | SR_2_LAN_SI     | Along-track height & freeboard over ice floes & leads | Sea-ice freeboard and thickness estimation       |
+| Pulse Peakiness & Quality Flags     | –               | Statistical metrics on waveform shape         | Filters low-confidence returns, surface classification |
+
+
 ### Synthetic Aperture Radar Mode
 
 In SAR mode, the SRAL transmits a burst of radar pulses at L-band frequency toward the Earth’s surface. Echoes are recorded at full bit-rate (FBR), capturing fine waveform structure. Onboard and on-ground Delay-Doppler processing coherently combines these pulses, synthesizing a narrower along-track antenna beam. The result is a set of high-resolution waveforms whose leading edge can be retracked to estimate the range to the surface with centimetric accuracy.
