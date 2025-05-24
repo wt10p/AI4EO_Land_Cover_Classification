@@ -40,6 +40,38 @@ Sentinel-3’s SAR Radar Altimeter (SRAL) delivers a tiered set of processing le
 
 ![SRAL Workflow](figures/s3_sral_workflow.png)
 
+## Remote Sensing Data & Processing Workflow
+![Remote Sensing Workflow](figures/remote_sensing_workflow.png)
+
+
+This project relies on Sentinel-3’s SAR Radar Altimeter (SRAL) to obtain high-resolution along-track measurements of sea surface and ice-surface height. The end-to-end processing chain is as follows:
+
+1. **Waveform Acquisition (Level-1A FBR)**  
+   - SRAL transmits and records full-bit-rate radar echoes (FBR) over ice-covered regions.  
+   - Raw waveforms capture fine echo structure needed for high-precision retracking.
+
+2. **Delay-Doppler Processing (Level-1B DD-FBR)**  
+   - On-ground Delay-Doppler (DD) processing coherently integrates pulses to narrow the along-track footprint (~300 m).  
+   - Generates high-resolution DD waveforms for subsequent retracking.
+
+3. **Retracking & Geophysical Parameter Extraction (Level-2)**  
+   - Apply retrackers (e.g., SAMOSA+, ALES+) to DD waveforms to locate the leading edge.  
+   - Combine retracked ranges with precise orbit data and ancillary corrections (tides, dry/wet troposphere, ionosphere, sea‐state bias).  
+   - Output Level-2 products in CF-compliant NetCDF:  
+     - **Sea Level Anomaly (SLA)**  
+     - **Radar Freeboard** (ice height above local water level)  
+     - **Pulse Peakiness & Quality Flags**
+
+4. **Regional Focus & Data Selection**  
+   - Extract all Level-2 “Land-Ice” (SR_2_LAN_SI) tracks over the Arctic for 2019-01-10 00:22 UTC to 2019-01-11 19:17 UTC via GPOD `.proc` files.  
+   - Parse each track into a Pandas DataFrame of (`lon`, `lat`, `time`, `SLA`, `freeboard`, `peakiness`, `quality_flag`, `ice_class`).
+
+5. **Along-Track Interpolation & Analysis**  
+   - Compare classical 1D cubic-spline interpolation with Sparse Gaussian Process (GPSat) models applied in sliding windows.  
+   - Evaluate performance using RMSE, bias, and correlation on held-out track segments.  
+   - Visualize observed vs. interpolated profiles and map-based gridded outputs.
+
+---
 
 
 ### Synthetic Aperture Radar Mode
